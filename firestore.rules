@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function para verificar si el usuario es admin
+    function isAdmin() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Colección de usuarios
+    match /users/{userId} {
+      // Usuario puede leer su propio documento
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Usuario puede crear su propio documento al registrarse
+      // Verifica que el UID coincida y que el rol sea 'client' por defecto
+      allow create: if request.auth != null && 
+                       request.auth.uid == userId &&
+                       request.resource.data.id == userId &&
+                       request.resource.data.role == 'client' &&
+                       request.resource.data.email is string &&
+                       request.resource.data.name is string;
+      
+      // Usuario puede actualizar su propio documento (excepto el rol y el ID)
+      allow update: if request.auth != null && 
+                       request.auth.uid == userId &&
+                       request.resource.data.id == resource.data.id &&
+                       request.resource.data.role == resource.data.role;
+      
+      // Admin puede leer y escribir todos los documentos de usuarios
+      allow read, write: if isAdmin();
+    }
+    
+    // Colección de citas (appointments) - para etapas futuras
+    match /appointments/{appointmentId} {
+      // Usuario autenticado puede leer todas las citas
+      allow read: if request.auth != null;
+      
+      // Usuario puede crear su propia cita
+      allow create: if request.auth != null && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Usuario puede actualizar/eliminar su propia cita
+      allow update, delete: if request.auth != null && 
+                                (resource.data.userId == request.auth.uid || isAdmin());
+      
+      // Admin puede hacer todo
+      allow read, write: if isAdmin();
+    }
+    
+    // Colección de horarios (schedules) - para etapas futuras
+    match /schedules/{scheduleId} {
+      // Solo admin puede leer y escribir horarios
+      allow read, write: if isAdmin();
+    }
+    
+    // Colección de ofertas de cascada (cascade_offers) - para etapas futuras
+    match /cascade_offers/{offerId} {
+      // Usuario autenticado puede leer ofertas relacionadas con sus citas
+      allow read: if request.auth != null;
+      
+      // Solo admin puede crear/actualizar ofertas
+      allow create, update: if isAdmin();
+    }
+  }
+}
+
