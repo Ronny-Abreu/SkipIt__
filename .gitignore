@@ -46,3 +46,4 @@ next-env.d.ts
 # templates local files
 /md
 .cursor/rules/project-standards.md
+README.md
