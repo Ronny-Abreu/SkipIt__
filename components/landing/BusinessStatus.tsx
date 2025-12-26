@@ -8,7 +8,7 @@ import type { WeeklySchedule } from "@/types/schedule";
 
 interface BusinessStatusProps {
   barberId: string;
-  variant?: "hero" | "fixed";
+  variant?: "hero" | "fixed" | "desktop-static";
   className?: string;
 }
 
@@ -45,6 +45,8 @@ export const BusinessStatus = ({ barberId, variant = "hero", className = "" }: B
 
   const baseClasses = variant === "fixed"
     ? (className.trim() === "" ? "relative z-10" : "fixed left-1/2 -translate-x-1/2 z-50 md:hidden")
+    : variant === "desktop-static"
+    ? "relative z-10"
     : "relative z-30 md:absolute md:top-[200px] md:left-[calc(50%-60px)] md:z-50";
 
   return (

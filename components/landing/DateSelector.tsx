@@ -67,7 +67,8 @@ export const DateSelector = ({
               <motion.button
                 key={date.toISOString()}
                 onClick={() => onDateChange(date)}
-                className="relative flex min-w-[60px] flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-colors"
+                className={`relative flex min-w-[60px] flex-col items-center gap-1 rounded-2xl px-4 py-3 transition-colors ${selected ? "bg-zinc-900" : ""
+                  }`}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{
@@ -80,6 +81,7 @@ export const DateSelector = ({
                   <motion.div
                     layoutId="selectedDate"
                     className="absolute inset-0 rounded-2xl bg-zinc-900"
+                    initial={false}
                     transition={{
                       type: "spring",
                       stiffness: 300,
@@ -88,16 +90,14 @@ export const DateSelector = ({
                   />
                 )}
                 <span
-                  className={`relative text-xs font-medium ${
-                    selected ? "text-white" : "text-zinc-500"
-                  }`}
+                  className={`relative z-10 text-xs font-medium ${selected ? "text-white" : "text-zinc-500"
+                    }`}
                 >
                   {DAY_LABELS[dayName].slice(0, 3)}
                 </span>
                 <span
-                  className={`relative text-lg font-bold ${
-                    selected ? "text-white" : "text-zinc-900"
-                  }`}
+                  className={`relative z-10 text-lg font-bold ${selected ? "text-white" : "text-zinc-900"
+                    }`}
                 >
                   {formatDayNumber(date)}
                 </span>

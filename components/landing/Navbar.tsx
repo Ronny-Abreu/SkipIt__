@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { X, ChevronRight } from "lucide-react";
+import { BusinessStatus } from "@/components/landing/BusinessStatus";
 
 const menuItems = [
   { label: "Acceder", href: "/login" },
@@ -16,7 +17,11 @@ const menuItems = [
   { label: "Soporte", href: "#soporte" },
 ];
 
-export const Navbar = () => {
+interface NavbarProps {
+  barberId?: string;
+}
+
+export const Navbar = ({ barberId = "default-barber-id" }: NavbarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -36,29 +41,44 @@ export const Navbar = () => {
               </span>
             </Link>
 
-            {/* Desktop Menu - Centrado */}
+            {/* BusinessStatus  */}
             <div className="hidden md:flex md:flex-1 md:items-center md:justify-center">
-              <div className="flex items-center gap-8">
-                {menuItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group relative text-sm font-medium text-zinc-900 transition-colors hover:text-zinc-600"
-                  >
-                    <span className="flex items-center gap-2">
-                      {item.label}
-                      <motion.span
-                        initial={{ opacity: 0, x: -4 }}
-                        whileHover={{ opacity: 1, x: 0 }}
-                        className="text-zinc-400 transition-opacity"
-                      >
-                        &gt;
-                      </motion.span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
+              <BusinessStatus barberId={barberId} variant="desktop-static" />
             </div>
+
+            {/* Desktop Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="hidden md:flex items-center justify-center p-2 text-zinc-900 transition-colors hover:text-zinc-600"
+              aria-label="Toggle menu"
+            >
+              <AnimatePresence mode="wait">
+                {isMobileMenuOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ opacity: 0, rotate: -90 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: 90 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <X className="h-6 w-6" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex flex-col gap-1.5"
+                  >
+                    <span className="block h-0.5 w-6 bg-zinc-900"></span>
+                    <span className="block h-0.5 w-6 bg-zinc-900"></span>
+                    <span className="block h-0.5 w-6 bg-zinc-900"></span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
 
             {/* Mobile Menu Button */}
             <button
@@ -96,7 +116,7 @@ export const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile & Desktop Menu (Sheet/Drawer) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <MobileMenu
@@ -123,9 +143,9 @@ const MobileMenu = ({ items, onClose }: MobileMenuProps) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-0 z-[100] h-full w-full bg-black md:hidden"
+      className="fixed inset-0 z-[100] h-full w-full bg-black"
     >
-      <div className="flex justify-end pr-4 pt-6 pb-4 relative z-[101]">
+      <div className="flex justify-end pr-4 pt-6 pb-4 relative z-[101] md:pr-8 md:pt-8">
         <motion.button
           onClick={onClose}
           initial={{ opacity: 0, scale: 0.8 }}
