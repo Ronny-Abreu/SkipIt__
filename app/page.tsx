@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Navbar } from "@/components/landing/Navbar";
-import { LocationBanner } from "@/components/landing/LocationBanner";
 import { BusinessStatus } from "@/components/landing/BusinessStatus";
 import { Hero } from "@/components/landing/Hero";
 import { DateSelector } from "@/components/landing/DateSelector";
@@ -109,7 +108,6 @@ export default function Home() {
   return (
     <main className="relative min-h-screen bg-white">
       <Navbar barberId={DEFAULT_BARBER_ID} />
-      <LocationBanner />
 
       <AnimatePresence>
         {!isStaticVisible && (

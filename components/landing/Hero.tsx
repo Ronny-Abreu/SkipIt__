@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 import { BusinessStatus } from "@/components/landing/BusinessStatus";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -26,6 +26,11 @@ export const Hero = ({ barberId, onReserveClick, onWaitClick }: HeroProps) => {
   const titleRef = useRef<HTMLDivElement>(null);
   const button1Ref = useRef<HTMLButtonElement>(null);
   const button2Ref = useRef<HTMLButtonElement>(null);
+  const addressRef = useRef<HTMLAnchorElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+
+  const BUSINESS_ADDRESS = "C. Libertad, Santo Domingo 10407";
+  const GOOGLE_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(BUSINESS_ADDRESS)}`;
 
   // Fase 1: Typewriter Effect
   useGSAP(() => {
@@ -65,13 +70,26 @@ export const Hero = ({ barberId, onReserveClick, onWaitClick }: HeroProps) => {
       !welcomeTextRef.current ||
       !titleRef.current ||
       !button1Ref.current ||
-      !button2Ref.current
+      !button2Ref.current ||
+      !addressRef.current ||
+      !logoRef.current
     )
       return;
+
+    gsap.set(logoRef.current, {
+      opacity: 0,
+      scale: 25,
+      xPercent: -50,
+      yPercent: -50,
+      top: "50%",
+      left: "25%",
+      position: "absolute",
+    });
 
     gsap.set(titleRef.current, { opacity: 0, y: 20 });
     gsap.set(button1Ref.current, { opacity: 0, y: 20 });
     gsap.set(button2Ref.current, { opacity: 0, y: 20 });
+    gsap.set(addressRef.current, { opacity: 0, y: 20 });
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -92,12 +110,44 @@ export const Hero = ({ barberId, onReserveClick, onWaitClick }: HeroProps) => {
       ease: "power2.in",
     });
 
+
+    tl.fromTo(
+      logoRef.current,
+      {
+        scale: 25,
+        opacity: 0,
+        xPercent: -50,
+        yPercent: -50,
+        top: "50%",
+        left: "25%",
+        position: "absolute",
+      },
+      {
+        scale: 1.5,
+        opacity: 1,
+        top: "-180px",
+        xPercent: 0,
+        yPercent: 0,
+        left: 0,
+        position: "absolute",
+        ease: "power1.out",
+        duration: 1.8,
+      },
+      "-=0.2"
+    );
+
+    tl.set(logoRef.current, {
+      xPercent: 0,
+      yPercent: 0,
+    });
+
+    // Título aparece debajo del logo
     tl.to(titleRef.current, {
       opacity: 1,
       y: 0,
       duration: 0.4,
       ease: "power2.out",
-    }, "-=0.3");
+    }, "-=0.2");
 
     tl.to(
       [button1Ref.current, button2Ref.current],
@@ -110,6 +160,13 @@ export const Hero = ({ barberId, onReserveClick, onWaitClick }: HeroProps) => {
       },
       "-=0.2"
     );
+
+    tl.to(addressRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      ease: "power2.out",
+    }, "-=0.1");
 
     return () => {
       ScrollTrigger.getAll().forEach(trigger => {
@@ -207,21 +264,37 @@ export const Hero = ({ barberId, onReserveClick, onWaitClick }: HeroProps) => {
 
           <div
             ref={textContainerRef}
-            className="col-span-6 flex flex-col justify-center items-start z-20"
+            className="col-span-6 flex flex-col justify-center items-start z-20 relative"
           >
             <div
               ref={welcomeTextRef}
               className="font-supreme text-7xl text-black leading-tight mb-8"
             />
 
-            <div ref={buttonsContainerRef} className="w-full">
+            <div ref={buttonsContainerRef} className="w-full relative">
+              <div
+                ref={logoRef}
+                className="absolute z-30 mb-6"
+                style={{
+                  opacity: 0,
+                  transform: "scale(25)",
+                  top: "-180px",
+                  left: 0,
+                }}
+              >
+                <span className="text-8xl md:text-9xl font-bold text-zinc-900 tracking-tight">
+                  <span className="inline-block -rotate-12 origin-center">V</span>
+                  <span className="inline-block rotate-12 origin-center">K</span>
+                </span>
+              </div>
+
               <h2
                 ref={titleRef}
                 className="font-supreme text-5xl text-black mb-8 opacity-0"
               >
                 ¿QUÉ DESEAS HACER?
               </h2>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-row gap-4 mb-4">
                 <button
                   ref={button1Ref}
                   onClick={onReserveClick}
@@ -237,6 +310,16 @@ export const Hero = ({ barberId, onReserveClick, onWaitClick }: HeroProps) => {
                   En Espera
                 </button>
               </div>
+              <a
+                ref={addressRef}
+                href={GOOGLE_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-zinc-500 opacity-0 transition-colors hover:text-black ml-2"
+              >
+                <MapPin className="h-4 w-4 flex-shrink-0" />
+                <span>{BUSINESS_ADDRESS}</span>
+              </a>
             </div>
           </div>
         </div>
